@@ -1,19 +1,153 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Post Generator AI</title>
-  <link rel="stylesheet" href="style.css"/>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PostGen - AI Social Post Generator</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1e1e2f, #2c3e50);
+        color: #f4f4f4;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px;
+      }
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+      }
+      p {
+        max-width: 600px;
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 1.1rem;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        max-width: 500px;
+      }
+      textarea, select, button {
+        padding: 15px;
+        font-size: 1rem;
+        border-radius: 10px;
+        border: none;
+        outline: none;
+      }
+      textarea {
+        resize: vertical;
+        min-height: 120px;
+      }
+      select {
+        background-color: #333;
+        color: #fff;
+      }
+      button {
+        background-color: #ff6b81;
+        color: white;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      button:hover {
+        background-color: #ff4757;
+      }
+      .output {
+        margin-top: 30px;
+        padding: 20px;
+        background-color: #2f3542;
+        border-radius: 10px;
+        max-width: 600px;
+        width: 100%;
+        white-space: pre-line;
+      }
+    </style>
+  
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.png" />
+  <meta name="theme-color" content="#ff6b81" />
 </head>
-<body>
-  <div class="container">
-    <h1>Social Media Post Generator</h1>
-    <textarea id="prompt" placeholder="اكتب موضوع البوست هنا..."></textarea>
-    <button onclick="generatePost()">ولّد البوست</button>
-    <div id="output"></div>
-  </div>
-  <script src="script.js"></script>
+
+  <body>
+    <h1>PostGen AI</h1>
+    <p>اكتب فكرتك، واختار المنصة واللغة والنبرة، وخلي الذكاء الصناعي يسوي البوست عنك ✨</p>
+    <form id="postForm">
+      <textarea id="idea" placeholder="اكتب فكرة البوست..." required></textarea>
+      <select id="platform">
+        <option value="Instagram">Instagram</option>
+        <option value="Facebook">Facebook</option>
+        <option value="Twitter">Twitter</option>
+        <option value="LinkedIn">LinkedIn</option>
+      </select>
+      <select id="language">
+        <option value="arabic">العراقية العامية</option>
+        <option value="english">English</option>
+      </select>
+      <select id="tone">
+        <option value="normal">عادي / Normal</option>
+        <option value="funny">مضحك / Funny</option>
+        <option value="serious">جدي / Serious</option>
+        <option value="motivational">تحفيزي / Motivational</option>
+        <option value="sarcastic">ساخر / Sarcastic</option>
+      </select>
+      <button type="submit">ولد البوست</button>
+    </form>
+    <div id="output" class="output" style="display: none;"></div>
+
+    <script>
+      document.getElementById('postForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+        const idea = document.getElementById('idea').value;
+        const platform = document.getElementById('platform').value;
+        const language = document.getElementById('language').value;
+        const tone = document.getElementById('tone').value;
+        const output = document.getElementById('output');
+        output.style.display = 'block';
+        output.textContent = '⏳ جاري توليد البوست...';
+
+        let prompt = `سويلي بوست مال ${platform} حسب هاي الفكرة: ${idea}، وخلي النبرة تكون ${tone} وباللهجة العراقية، وضيف بنهايته هاشتاك و CTA بسيط.`;
+        if (language === 'english') {
+          prompt = `Create a ${tone} social media post for ${platform} based on this idea: ${idea}. Add a relevant hashtag and a call-to-action at the end.`;
+        }
+
+        try {
+          const res = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer sk-xxx-REPLACE-ME'
+            },
+            body: JSON.stringify({
+              model: 'gpt-3.5-turbo',
+              messages: [
+                { role: 'system', content: 'أنت خبير في كتابة منشورات السوشيال ميديا بأسلوب جذاب ومناسب للمنصة والنبرة المطلوبة.' },
+                { role: 'user', content: prompt }
+              ]
+            })
+          });
+
+          const data = await res.json();
+          const reply = data.choices[0].message.content;
+          output.textContent = reply;
+        } catch (err) {
+          output.textContent = '❌ صار خطأ أثناء التوليد، جرب مرة ثانية.';
+        }
+      });
+    </script>
+  
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js").then(() => {
+        console.log("Service Worker registered!");
+      });
+    }
+  </script>
 </body>
+
 </html>

@@ -1,0 +1,22 @@
+
+{
+  "name": "PostGen AI",
+  "short_name": "PostGen",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#1e1e2f",
+  "theme_color": "#ff6b81",
+  "description": "AI-generated social media posts in Arabic and English",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
